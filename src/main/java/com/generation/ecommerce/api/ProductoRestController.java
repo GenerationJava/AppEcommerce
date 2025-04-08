@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController//Anotación que indica que el controlador sigue patrón REST, es decir, define endpoints y entrega la respuesta en formato JSON
 @RequiredArgsConstructor
-@RequestMapping("/productos")//Ruta base
+@RequestMapping("/api/productos")//Ruta base
 public class ProductoRestController {
 
     //Inyección de dependencia
