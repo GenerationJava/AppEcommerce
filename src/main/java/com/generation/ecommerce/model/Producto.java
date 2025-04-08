@@ -23,5 +23,9 @@ public class Producto {
     private Integer stock;
     /**** OTROS ATRIBUTOS Y RELACIONES ****/
 
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
+
 
 }

@@ -42,7 +42,8 @@ public class ProductoRestController {
     //Endpoint para eliminar un producto por ID
     @DeleteMapping("/borrar/{id}")
     public ResponseEntity<?> deleteProductoById(@PathVariable Long id) {
-        return new ResponseEntity<>("El producto ha sido eliminado", HttpStatus.OK);
+        productoService.deleteProductoById(id);
+        return new ResponseEntity<>("El producto ha sido eliminado", HttpStatus.OK);//Status 200
     }
 
     //Endpoint para editar un producto por ID
@@ -57,7 +58,6 @@ public class ProductoRestController {
         productoService.saveProducto(productoSeleccionado);
 
         return new ResponseEntity<>(productoSeleccionado, HttpStatus.OK);
-
 
     }
 
