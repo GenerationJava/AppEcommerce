@@ -1,5 +1,6 @@
 package com.generation.ecommerce.api;
 
+import com.generation.ecommerce.model.ECategoria;
 import com.generation.ecommerce.model.Producto;
 import com.generation.ecommerce.service.ProductoServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -55,11 +56,37 @@ public class ProductoRestController {
         productoSeleccionado.setNombre(productoEditado.getNombre());
         productoSeleccionado.setPrecio(productoEditado.getPrecio());
         productoSeleccionado.setStock(productoEditado.getStock());
+        productoSeleccionado.setCategoria(productoEditado.getCategoria());
         productoService.saveProducto(productoSeleccionado);
 
         return new ResponseEntity<>(productoSeleccionado, HttpStatus.OK);
 
     }
+
+    //Métodos más específicos
+    //Endpoint par buscar producto por nombre
+    //Endpoint trabaja conn un parámetro de consulta
+    @GetMapping("/producto")
+    public ResponseEntity<Producto> findProductoByNombre(@RequestParam(name = "nombre") String nombre) {
+        System.out.println(nombre);
+        return new ResponseEntity<>(productoService.findProductoByNombre(nombre), HttpStatus.OK);
+    }
+
+    //Endpoint para buscar lista de productos por categoría
+    @GetMapping("/categoria")
+    public ResponseEntity<List<Producto>> findAllProductoByCategoria(@RequestParam(name = "categoria") ECategoria categoria) {
+
+        return new ResponseEntity<>(productoService.findAllProductoByCategoria(categoria), HttpStatus.OK);
+    }
+
+    //Endpoint para buscar lista de productos por rango de precio
+    @GetMapping("/por-precio")
+    public ResponseEntity<List<Producto>> findAllProductoByRangoPrecio(@RequestParam(name = "min") Double min,
+                                                                       @RequestParam(name = "max") Double max) {
+        return new ResponseEntity<>(productoService.findAllProductoByRangoPrecio(min, max), HttpStatus.OK);
+    }
+
+
 
 
 

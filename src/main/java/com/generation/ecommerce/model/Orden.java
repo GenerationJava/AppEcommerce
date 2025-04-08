@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder//Esta anotación de lombok permite generar un patrón de constructor
 public class Orden {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,10 +28,9 @@ public class Orden {
     @Enumerated(EnumType.STRING)
     private EEstadoOrden estado;
 
+
     private LocalDateTime fechaCreacion;
 
     // Otros campos y relaciones
-
-
 }
 
