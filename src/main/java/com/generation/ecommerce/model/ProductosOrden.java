@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+//Esta entidad ya no es necesaria por el DTO de la Orden
 public class ProductosOrden {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
