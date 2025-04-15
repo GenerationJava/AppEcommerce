@@ -4,6 +4,7 @@ import com.generation.ecommerce.dto.OrdenDTO;
 import com.generation.ecommerce.exception.OrdenException;
 import com.generation.ecommerce.exception.StockInsuficienteException;
 import com.generation.ecommerce.service.OrdenServiceImpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/ordenes")
 @RequiredArgsConstructor
+@Tag(name = "Controlador de Órdenes", description = "Controlador que recibe solicitudes de orden a través de un OrdenDTO")
 public class OrdenRestController {
 
     //Inyectamos dependencia del servicio
