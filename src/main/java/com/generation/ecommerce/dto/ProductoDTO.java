@@ -21,5 +21,5 @@ public class ProductoDTO {
     @NotNull
     private Long categoriaId;
 
-    private MultipartFile imagen;
+    private String imagen;
 }

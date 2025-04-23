@@ -1,9 +1,11 @@
 package com.generation.ecommerce.api;
 
 
+import com.generation.ecommerce.dto.ProductoDTO;
 import com.generation.ecommerce.model.ECategoria;
 import com.generation.ecommerce.model.Producto;
 import com.generation.ecommerce.service.ProductoServiceImpl;
+import com.generation.ecommerce.storage.GoogleCloudStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -14,19 +16,25 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController//Anotación que indica que el controlador sigue patrón REST, es decir, define endpoints y entrega la respuesta en formato JSON
 @RequiredArgsConstructor
 @RequestMapping("/api/productos")//Ruta base
 @Tag(name = "Controlador Rest de Producto", description = "Este controlador disponibiliza métodos de lectura, escritura y eliminación de productos")
+@CrossOrigin("*")
 public class ProductoRestController {
 
     //Inyección de dependencia
     private final ProductoServiceImpl productoService;
+    private final GoogleCloudStorageService storageService;
+
 
     //Creamos endpoints que permitan realizar el CRUD
     //Endpoint para buscar Producto por ID
@@ -58,15 +66,32 @@ public class ProductoRestController {
                      content = @Content(schema = @Schema(implementation = Producto.class))),
         @ApiResponse(responseCode = "400", description = "Datos del producto son inválidos")
     })
-    @PostMapping("/nuevo")
-    public ResponseEntity<Producto> saveProducto(
+    @PostMapping(value = "/nuevo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductoDTO> saveProducto(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "DTO de Producto que será creado",
                     required = true,
-                    content = @Content(schema = @Schema(implementation = Producto.class))
+                    content = @Content(schema = @Schema(implementation = ProductoDTO.class))
             )
-            @RequestBody Producto nuevoProducto) {
-        return new ResponseEntity<>(productoService.saveProducto(nuevoProducto), HttpStatus.CREATED);
+            @RequestPart("producto") ProductoDTO nuevoProducto,
+            @RequestPart("imagen") MultipartFile imagen) throws IOException {
+
+
+        //Subimos imagen si esta existe
+        String imagenUrl = null;
+        if (!imagen.isEmpty()) {
+            imagenUrl = storageService.updloadImagenProducto(imagen);
+        }
+
+        //Convertimos el DTO a modelo
+        Producto producto = toModel(nuevoProducto);
+        //Le seteamos la url de la imagen
+        producto.setImagenUrl(imagenUrl);
+        nuevoProducto.setImagen(imagenUrl);
+        //Le mandamos el modelo al service para que lo envíe al repo
+        productoService.saveProducto(producto);
+
+        return new ResponseEntity<>(nuevoProducto, HttpStatus.CREATED);
     }
 
 
@@ -149,6 +174,15 @@ public class ProductoRestController {
             @RequestParam(name = "min") Double min,
             @Parameter(name = "max", description = "Precio máximo del rango", example = "50000.00", required = true)@RequestParam(name = "max") Double max) {
         return new ResponseEntity<>(productoService.findAllProductoByRangoPrecio(min, max), HttpStatus.OK);
+    }
+
+    //Método que mapea la conversión de un DTO a Modelo Producto
+    public Producto toModel(ProductoDTO nuevoProducto) {
+        Producto producto = new Producto();
+        producto.setStock(nuevoProducto.getStock());
+        producto.setPrecio(nuevoProducto.getPrecio());
+        producto.setNombre(producto.getNombre());
+        return producto;
     }
 
 }
