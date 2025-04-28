@@ -2,8 +2,10 @@ package com.generation.ecommerce.api;
 
 
 import com.generation.ecommerce.dto.ProductoDTO;
+import com.generation.ecommerce.model.Categoria;
 import com.generation.ecommerce.model.ECategoria;
 import com.generation.ecommerce.model.Producto;
+import com.generation.ecommerce.service.CategoriaServiceImpl;
 import com.generation.ecommerce.service.ProductoServiceImpl;
 import com.generation.ecommerce.storage.GoogleCloudStorageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +36,7 @@ public class ProductoRestController {
     //Inyección de dependencia
     private final ProductoServiceImpl productoService;
     private final GoogleCloudStorageService storageService;
+    private final CategoriaServiceImpl categoriaService;
 
 
     //Creamos endpoints que permitan realizar el CRUD
@@ -83,12 +86,18 @@ public class ProductoRestController {
             imagenUrl = storageService.updloadImagenProducto(imagen);
         }
 
+        //Buscamos la categoria por el ID
+        Categoria categoria = categoriaService.findById(nuevoProducto.getCategoriaId());
+
+
         //Convertimos el DTO a modelo
         Producto producto = toModel(nuevoProducto);
         //Le seteamos la url de la imagen
         producto.setImagenUrl(imagenUrl);
         nuevoProducto.setImagen(imagenUrl);
         //Le mandamos el modelo al service para que lo envíe al repo
+        producto.setCategoria(categoria);
+        System.out.println(nuevoProducto.getNombre());
         productoService.saveProducto(producto);
 
         return new ResponseEntity<>(nuevoProducto, HttpStatus.CREATED);
@@ -181,7 +190,7 @@ public class ProductoRestController {
         Producto producto = new Producto();
         producto.setStock(nuevoProducto.getStock());
         producto.setPrecio(nuevoProducto.getPrecio());
-        producto.setNombre(producto.getNombre());
+        producto.setNombre(nuevoProducto.getNombre());
         return producto;
     }
 
